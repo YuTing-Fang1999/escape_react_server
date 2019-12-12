@@ -1,0 +1,11 @@
+[0;1;31m●[0m mongodb.service - An object/document-oriented database
+   Loaded: loaded (/lib/systemd/system/mongodb.service; enabled; vendor preset: enabled)
+   Active: [0;1;31mfailed[0m (Result: exit-code) since Wed 2019-11-06 11:35:22 UTC; 3s ago
+     Docs: man:mongod(1)
+  Process: 19585 ExecStart=/usr/bin/mongod --unixSocketPrefix=${SOCKETPATH} --config ${CONF} $DAEMON_OPTS [0;1;31m(code=exited, status=1/FAILURE)[0m
+ Main PID: 19585 (code=exited, status=1/FAILURE)
+
+Nov 06 11:35:22 micro_server systemd[1]: Started An object/document-oriented database.
+Nov 06 11:35:22 micro_server mongod[19585]: 2019-11-06T11:35:22.735+0000 F CONTROL  [main] Failed global initialization: FileNotOpen: Failed to open "/var/log/mongodb/mongodb.log"
+Nov 06 11:35:22 micro_server systemd[1]: [0;1;39m[0;1;31m[0;1;39mmongodb.service: Main process exited, code=exited, status=1/FAILURE[0m
+Nov 06 11:35:22 micro_server systemd[1]: [0;1;39m[0;1;31m[0;1;39mmongodb.service: Failed with result 'exit-code'.[0m

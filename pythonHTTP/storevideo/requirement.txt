@@ -1,0 +1,5 @@
+MTCNN
+tensorflow
+tensorflow-gpu
+numpy
+opencv-python
