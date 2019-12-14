@@ -217,6 +217,14 @@ password={
 	"name": "password",
 	"isOpen": False,
 }
+
+nineBlock={
+	"name": "nineBlock",
+	"isConnect": False,
+	"pushBtn": False,
+	"correct": False,
+}
+
 # <=========================================>
 
 menuListState = {							# website menuList state
@@ -353,3 +361,7 @@ result = collection.insert(RFID)
 collection = db.password
 result = collection.remove({})
 result = collection.insert(password)
+
+collection = db.nineBlock
+result = collection.remove({})
+result = collection.insert(nineBlock)

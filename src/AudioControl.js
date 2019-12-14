@@ -345,6 +345,12 @@ class AudioControl extends Component {
                     songList: data
                 })
             })
+            .catch(error => {
+                this.setState({
+                    songList: ""
+                })
+                console.log(error)
+            })
         axios
             .get('http://192.168.50.225:8888/checkSongIndex')
             .then(response => {
@@ -354,6 +360,12 @@ class AudioControl extends Component {
                     isStopState: data[0].isStopState,
                     nowProgress: data[0].nowProgress,
                 })
+            })
+            .catch(error => {
+                this.setState({
+                    songList: ""
+                })
+                console.log(error)
             })
     }
     handleTextFieldChange(e){                           // handle submit add songList

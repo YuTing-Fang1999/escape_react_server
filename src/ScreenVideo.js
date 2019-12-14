@@ -153,7 +153,7 @@ class ScreenVideo extends Component {
             </Paper>
             <TabPanel value={this.state.tabValue} index={0}>
                 <Paper className={fixedHeightPaper}>
-                    <h2 className={classes.textMargin}>第一間螢幕(暫定)</h2>
+                    <h2 className={classes.textMargin}>第一間螢幕(教授採訪)</h2>
                     <div>
                         <Button className={classes.buttonMargin} variant="contained" color="primary" onClick={this.handlePlayVideoButton.bind(this, 213)}>
                             播放影片
@@ -223,7 +223,7 @@ class ScreenVideo extends Component {
             </TabPanel>
             <TabPanel value={this.state.tabValue} index={2}>
                 <Paper className={fixedHeightPaper}>
-                    <h2 className={classes.textMargin}>第三間螢幕 (暫定)</h2>
+                    <h2 className={classes.textMargin}>第三間螢幕 (監視器)</h2>
                     <div>
                         <Button className={classes.buttonMargin} variant="contained" color="primary" onClick={this.handlePlayVideoButton.bind(this, 217)}>
                             播放影片
@@ -236,6 +236,23 @@ class ScreenVideo extends Component {
                         </Button>
                         <h2 className={classes.textMargin}>目前正在播：{this.state.allScreenState[4] && this.state.allScreenState[4].isPlaying}</h2>
                         <h2 className={classes.textMargin}>isConnected：{String(this.state.allScreenState[4] && this.state.allScreenState[4].isConnect)}</h2>
+                    </div> 
+                </Paper>
+                <br/>
+                <Paper className={fixedHeightPaper}>
+                    <h2 className={classes.textMargin}>第三間螢幕 (音波圖)</h2>
+                    <div>
+                        <Button className={classes.buttonMargin} variant="contained" color="primary" onClick={this.handlePlayVideoButton.bind(this, 218)}>
+                            播放影片
+                        </Button>
+                        <Button className={classes.buttonMargin} variant="contained" color="secondary" onClick={this.handlePlayBlackVideoButton.bind(this, 218)}>
+                            播放黑影片
+                        </Button>
+                        <Button className={classes.buttonMargin} variant="contained" color="primary" onClick={this.handleStopPlayButton.bind(this, 218)}>
+                            停止播放
+                        </Button>
+                        <h2 className={classes.textMargin}>目前正在播：{this.state.allScreenState[5] && this.state.allScreenState[5].isPlaying}</h2>
+                        <h2 className={classes.textMargin}>isConnected：{String(this.state.allScreenState[5] && this.state.allScreenState[5].isConnect)}</h2>
                     </div> 
                 </Paper>
             </TabPanel>

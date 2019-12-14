@@ -239,7 +239,7 @@ def openDoor(index, isOpen):
 		meg_state = " 關起來了！"
 		
 	# 如果門打開了就開始儲存影片
-	if isOpen == 1:
+	if index == 1 and isOpen == 1:
 		os.chdir("/home/micro/mushding-app/pythonHTTP/storevideo")
 		now =datetime.now()
 		db.savingTime.remove({})
@@ -250,8 +250,16 @@ def openDoor(index, isOpen):
 		db.videoState.update({"name": "videoState"}, {"$set": {"start": True}}, True)
 		os.system("./videoA.sh &")	# sorry
 	
-	# if isOpen == 2:
-		
+	if index == 2 and isOpen == 1:
+		# alert light on
+		requests.get("http://192.168.50.91/set_light?params=1")
+		# play sound
+		requests.get("http://192.168.50.210:5000/playThirdRoomAlert")
+		# play monitary video
+		requests.get("http://192.168.50.217:5000/playVideo")
+		# play soundwave video
+		requests.get("http://192.168.50.218:5000/playVideo")
+
 
 	db.notifications.insert({
 		'_id': nextNotifications("productid"),
@@ -523,16 +531,55 @@ def getWireBox():
 	requests.get('http://192.168.50.225:8888/openDoor/46/1')				
 	return "WierBox successfully"
 
-# Get Nine Blocks
-@app.route('/getNineBlock', methods=['GET'])
-def getNineBlock():
-	db.notifications.insert({
-	    '_id': nextNotifications("productid"),
-	    'avatarIcon': "BuildIcon_3",
-	    'message': "(第三間房間) 九宮格 過關了！ ",
-	    'time': time.strftime("%H:%M:%S", time.localtime()),
-	})
-	return "get successfully"
+# player press the button -> start
+@app.route('/startNineBlock', methods=['GET'])
+def startNineBlock():
+	# start wheel running
+	requests.get('http://192.168.50.100/set_run?params=1')
+	db.nineBlock.update({"name": "nineBlock"},{"$set": {"pushBtn": True}}, True)
+	return "start successfully"
+
+# player press the button -> stop
+@app.route('/stopNineBlock', methods=['GET'])
+def stopNineBlock():
+	# start wheel running
+	requests.get('http://192.168.50.100/set_run?params=0')
+	db.nineBlock.update({"name": "nineBlock"},{"$set": {"pushBtn": False}}, True)
+	return "stop successfully"
+
+# player perss the button and check correct answer
+@app.route('/checkNineBlock/<int:iscorrect>', methods=['GET'])
+def checkNineBlock(iscorrect):
+	if iscorrect == 0:
+		pass
+	elif iscorrect == 1:
+		db.notifications.insert({
+			'_id': nextNotifications("productid"),
+			'avatarIcon': "BuildIcon_3",
+			'message': "(第三間房間) 九宮格 過關了！ ",
+			'time': time.strftime("%H:%M:%S", time.localtime()),
+		})
+		db.nineBlock.update({"name": "nineBlock"},{"$set": {"correct": True}}, True)
+	return "check successfully"
+
+# react get server
+@app.route('/NineBlock', methods=['GET'])
+def NineBlock():
+	try:
+		requests.get('http://192.168.50.212')
+	except requests.exceptions.RequestException as e:
+		db.nineBlock.update({"name": "nineBlock"},{"$set": {"isConnect": False}}, True)
+	else:
+		db.nineBlock.update({"name": "nineBlock"},{"$set": {"isConnect": True}}, True)
+	finally:
+		nineBlock_json = db.nineBlock.find()
+		nineBlock_json = json.loads(json_util.dumps(nineBlock_json))
+		return jsonify(nineBlock_json)
+
+@app.route('/resetNineBlock/<bool: pushBtn>', methods=['GET'])
+def resetNineBlock(pushBtn):
+	db.nineBlock.update({"name": "nineBlock"},{"$set": {"correct": False}}, True)
+	return "0k"
 
 @app.route('/checkMergeVideo/<int:pid>', methods=['GET'])
 def checkMergeVideo(pid):
@@ -633,7 +680,14 @@ def startContinue():
 @app.route('/checkSongIndex', methods=['GET'])
 def checkSongIndex():
 	# check progress
-	result = requests.get('http://192.168.50.210:5000/checkPosition')
+	try:
+		result = requests.get('http://192.168.50.210:5000/checkPosition')
+	except requests.exceptions.RequestException as e:
+		print(e)
+		result = db.youtubeSongIndex.find({'playNowIndex': {'$exists': True}})
+		result = json.loads(json_util.dumps(result))
+		return jsonify(result)
+
 	duration = result.json()['duration']
 	position = result.json()['position']
 	percentages = 0
@@ -702,10 +756,15 @@ def deleteYoutubeSongList(index):
 def checkYoutubeSongList():
 	result = db.youtubeSongIndex.find({'sequence_value': {'$exists': True}})
 	result = json.loads(json_util.dumps(result))
+	
+	try:
+		result = requests.get("http://192.168.50.210:5000/checkYoutubeDLList")
+	except requests.exceptions.RequestException as e:
+		print(e)
+		result = db.youtubeSongList.find({'index': {'$exists': True}})
+		result = json.loads(json_util.dumps(result))
+		return jsonify(result)
 
-	result = requests.get("http://192.168.50.210:5000/checkYoutubeDLList")
-	# print(result.json()[0]['index'])
-	# exit()
 	db.youtubeSongList.remove({})	
 	if result.json() != []:
 		db.youtubeSongList.insert(result.json())

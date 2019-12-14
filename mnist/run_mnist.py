@@ -9,6 +9,7 @@ import time
 import requests
 from mnist_model import LeNet, predict
 import argparse
+from check_cycle import check_cycle
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -33,6 +34,11 @@ if __name__ == '__main__':
             month_img, day_img = getimage(args.x1, args.y1, args.len1, args.x2, args.y2, args.len2)
             month = predict( biamp(month_img), net )
             day = predict( biamp(day_img), net )
+            if not check_cycle( month_img ):
+                month = -2
+            if not check_cycle( day_img ):
+                day = -2
+
             print(month,'/',day, ' count = ', count, sep="")
             requests.get('http://192.168.50.225:8888/checkWritingCamera/'+str(month)+'/'+str(day))
             if month == 5 and day == 5:

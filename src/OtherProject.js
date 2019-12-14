@@ -86,6 +86,7 @@ class OtherProject extends Component {
             powerOpen: {},
             wireBoxOpen: {},
             coffinOpen: {},
+            nineBlock: {},
             writingCamera: {},
             lightError: false,
 
@@ -104,6 +105,7 @@ class OtherProject extends Component {
         this.controlCamera = this.controlCamera.bind(this)
         this.controlWireBox = this.controlWireBox.bind(this)
         this.controlCoffin = this.controlCoffin.bind(this)
+        this.controlNineBlock = this.controlNineBlock.bind(this)
         this.handleLightColorContinueFloar = this.handleLightColorContinueFloar.bind(this)
         this.handleLightColorCompleteFloar = this.handleLightColorCompleteFloar.bind(this)
         this.handleLightColorContinueMask = this.handleLightColorContinueMask.bind(this)
@@ -150,6 +152,14 @@ class OtherProject extends Component {
                     coffinOpen: data[0]
                 })
             })
+        axios
+            .get('http://192.168.50.225:8888/NineBlock')
+            .then(response => {
+                let data = response.data;
+                this.setState({
+                    nineBlockOpen: data[0]
+                })
+            })
     }
     componentWillUnmount() {
         clearInterval(this.timerID);
@@ -190,6 +200,10 @@ class OtherProject extends Component {
     controlCoffin(isOpen){
         axios
             .get('http://192.168.50.225:8888/resetCoffin/' + isOpen)
+    }
+    controlNineBlock(pushBtn){
+        axios
+            .get('http://192.168.50.225:8888/resetNineBlock/' + pushBtn)
     }
     handleLightColorCompleteFloar = (color, event) => {
         this.setState({
@@ -373,6 +387,17 @@ class OtherProject extends Component {
             <TabPanel value={this.state.tabValue} index={2}>
                 <Paper className={fixedHeightPaper}>
                     <h2 className={classes.textMargin}>九宮格</h2>
+                    <div>
+                        <Button className={classes.buttonMargin} variant="contained" color="primary" onClick={this.controlNineBlock.bind(this, true)}>
+                            Set Correct
+                        </Button>
+                        <Button className={classes.buttonMargin} variant="contained" color="secondary" onClick={this.controlNineBlock.bind(this, false)}>
+                            Set Wrong
+                        </Button> 
+                    </div>
+                    <h2 className={classes.textMargin} >isPushBtn：{this.state.nineBlock.pushBtn}</h2>
+                    <h2 className={classes.textMargin} >isCorrect：{this.state.nineBlock.correct}</h2>
+                    <h2 className={classes.textMargin} >isConnected：{String(!this.state.nineBlock.isConnect)}</h2>
                 </Paper>
                 <br/>
                 <Paper className={fixedHeightPaper}>

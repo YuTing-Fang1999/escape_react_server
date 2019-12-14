@@ -194,7 +194,7 @@ class SaveVideo extends React.Component {
                     completed: newCompleted,
                 },function(){
                   if(!this.state.start){
-                    this.setState({msg: "還未儲存"})
+                    this.setState({msg: "還未儲存",time: ""})
                   }else if(this.state.start && !this.state.end){
                     this.setState({msg: "正在儲存"});
                     this.computeSec();
@@ -203,7 +203,7 @@ class SaveVideo extends React.Component {
                     clearInterval(this.timerID);
                   }
 
-                  if(this.state.start &&　this.state.time>50){
+                  if(this.state.start &&　this.state.time>350){
                     if(!this.state.completed[0]){
                       this.saveVedio(0);
                       this.setState({time: 0});
