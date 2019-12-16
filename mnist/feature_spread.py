@@ -7,7 +7,8 @@ import argparse
 def biamp(input_img):
 	SIZE = 128
 	input_img = cv2.cvtColor(input_img, cv2.COLOR_BGR2GRAY)
-	___, img = cv2.threshold(input_img, thresh=90, maxval=255, type=cv2.THRESH_BINARY_INV)
+	# ___, img = cv2.threshold(input_img, thresh=90, maxval=255, type=cv2.THRESH_BINARY_INV)
+	___, img = cv2.threshold(input_img, thresh=60, maxval=255, type=cv2.THRESH_BINARY_INV)
 	
 	img = cv2.resize(img, (SIZE, SIZE))
 
@@ -71,9 +72,7 @@ def biamp(input_img):
 					dfs(que[0][0],que[0][1],1)
 					que.pop(0)
 	
-	# for i in block:
-	# 	print(i, block[i])
-	# print('-'*50)
+	#arr will be transfer to only 0 or 254
 	if len(block) > 0:
 		max_size = 254
 		for i in block:

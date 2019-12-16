@@ -28,8 +28,9 @@ db = client.website
 def checkIPInThread(ip, request):
 	try:
 		request_get = requests.get(request)
-	except requests.exceptions.RequestException as e:	# if ip is not on the wifi
+	except:	# if ip is not on the wifi
 		db.screenState.find_one_and_update({'ip': str(ip)}, {"$set": {"isConnect": False}})
+		return 
 	else:
 		db.screenState.find_one_and_update({'ip': str(ip)}, {"$set": {"isConnect": True}})			
 		db.screenState.find_one_and_update({'ip': str(ip)}, {"$set": {"isPlaying": request_get.json()['isPlaying']}})
@@ -97,11 +98,11 @@ def checkDoor():
 
 	return jsonify(door_json)
 
-# Check Usb Video state (212) video 1 ~ 3
+# Check Usb Video state (218) video 1 ~ 3
 @app.route('/checkUsb', methods=['GET'])
 def checkUsb():
 	try:
-		usbVideoState = requests.get('http://192.168.50.212:5000/checkScreenState')
+		usbVideoState = requests.get('http://192.168.50.218:5000/checkScreenState')
 	except requests.exceptions.RequestException as e:
 		db.usbVideo.find_one_and_update({"usb_1": {"$exists": True}}, {"$set": {"error": True}})
 	else:
@@ -111,6 +112,30 @@ def checkUsb():
 		usbVideo_json = db.usbVideo.find({'usb_1': {'$exists': True}})
 		usbVideo_json = json.loads(json_util.dumps(usbVideo_json))
 		return jsonify(usbVideo_json)
+
+@app.route('/firstUsb', methods=['GET'])
+def firstUsb():
+
+	# close power
+	requests.get("http://192.168.50.225:8888/getPower/0")
+	# close sound
+	requests.get("http://192.168.50.210:5000/stopPlayingSound")
+	# play noise sound
+	requests.get("http://192.168.50.210:5000/playStartAnnoyingSound")
+	# close alert light
+	requests.get("http://192.168.50.91/set_light?params=0")
+	# light line (floar)
+	requests.get("http://192.168.50.70/set_breathing_light?params=1")
+	# light line (mask)
+	requests.get("http://192.168.50.19/set_breathing_light?params=1")
+	# open menu light
+	requests.get("http://192.168.50.90/set_light?params=1")
+	# start playing wav file
+	requests.get("http://192.168.50.218:5000/playLoopVideo")
+	# activate nine block button
+	requests.get("http://192.168.50.20/set_btn?params=1")
+
+	return "first USB insert"
 
 # Check calculator (211)
 @app.route('/checkCalculator', methods=['GET'])
@@ -139,6 +164,8 @@ def getCalculator():
 
 	# Open drawer (C)(42)
 	requests.get('http://192.168.50.225:8888/openDrawer/42/1')
+	# start play video (C)
+	# requests.get('http://192.168.50.214:5000/playVideo')		TODO: STAT PLAYING VIDEO (C)
 
 	return "Open drawer successfully"
 
@@ -220,8 +247,15 @@ def openDrawer(index, isOpen):
 	    'message': "第" + meg_index + "個抽屜" + meg_state,
 	    'time': time.strftime("%H:%M:%S", time.localtime()),
 	})	
+	if isOpen == 1:
+		requests.get('http://192.168.50.210:5000/playSecondRoomWireBox')
 	requests.get('http://192.168.50.' + str(index) + '/set_lock?params=' + str(isOpen))
 	return jsonify('open drawer successfully')
+
+@app.route('/openOnlyDoor/<int:index>/<int:isOpen>', methods=['GET'])
+def openOnlyDoor(index, isOpen):
+	requests.get('http://192.168.50.' + str(index) + '/set_lock?params=' + str(isOpen))
+	return 'open door successfully'
 
 # Open Door (45 - 47)
 @app.route('/openDoor/<int:index>/<int:isOpen>', methods=['GET'])
@@ -239,7 +273,7 @@ def openDoor(index, isOpen):
 		meg_state = " 關起來了！"
 		
 	# 如果門打開了就開始儲存影片
-	if index == 1 and isOpen == 1:
+	if index == 45 and isOpen == 1:
 		os.chdir("/home/micro/mushding-app/pythonHTTP/storevideo")
 		now =datetime.now()
 		db.savingTime.remove({})
@@ -250,7 +284,7 @@ def openDoor(index, isOpen):
 		db.videoState.update({"name": "videoState"}, {"$set": {"start": True}}, True)
 		os.system("./videoA.sh &")	# sorry
 	
-	if index == 2 and isOpen == 1:
+	if index == 46 and isOpen == 1:
 		# alert light on
 		requests.get("http://192.168.50.91/set_light?params=1")
 		# play sound
@@ -284,6 +318,11 @@ def checkPower():
 		power_json = json.loads(json_util.dumps(power_json))
 		return jsonify(power_json)
 
+@app.route('/getOnlyLight/<int:index>', methods=['GET'])
+def getOnlyLight(index):
+	requests.get('http://192.168.50.49/set_lock?params=' + str(index))
+	return "ok"
+
 # Get Electric Power (49) for progress
 @app.route('/getPower/<int:index>', methods=['GET'])
 def getPower(index):
@@ -305,8 +344,12 @@ def getPower(index):
 		requests.get("http://192.168.50.225:8888/killFirstRoomCamera")
 		requests.get("http://192.168.50.225:8888/setFirstRoomCamera/0")
 	
+
 	# Open Power
 	requests.get('http://192.168.50.49/set_lock?params=' + str(index))
+
+	if index == 1:
+		requests.get("http://192.168.50.213:5000/playVideo")
 
 	db.notifications.insert({
 	    '_id': nextNotifications("productid"),
@@ -326,18 +369,6 @@ def getPower(index):
 
 	return "open power successfully"
 
-# Get phone 4 RFID card
-@app.route('/getRFID', methods=['GET'])
-def getRFID():
-	db.notifications.insert({
-	    '_id': nextNotifications("productid"),
-	    'avatarIcon': "BuildIcon_1",
-	    'message': "(第一間房間) RFID 開了！ ",
-	    'time': time.strftime("%H:%M:%S", time.localtime()),
-	})
-	db.RFID.update({"name": "RFID"}, {"$set": {"isOpen": True}}, True)
-
-	return "RFID get successfully"
 
 # Kill FirstRoom Camera
 @app.route('/killFirstRoomCamera', methods=['GET'])
@@ -421,6 +452,8 @@ def getCoffin():
 
 	# Open Drawer (B)(41)
 	requests.get('http://192.168.50.225:8888/openDrawer/41/1')
+	# play video (B)
+	# requests.get('http://192.168.50.216:5000/playVideo')		TODO: START PLAYING VIDEO (B)
 
 	return "get successfully"
 
@@ -480,7 +513,9 @@ def getWritingCemara(pid):
 	os.system(myCmd)												
 
 	# open (D)(40) Drawer
-	requests.get('http://192.168.50.225:8888/openDrawer/40/1') 			
+	requests.get('http://192.168.50.225:8888/openDrawer/40/1')
+	# play video (D)
+	# requests.get('http://192.168.50.215:5000/playVideo') 		TODO: START PLAYING VIDEO		
 	return "kill pid successfully"
 	
 # Check Wier Box (60) for web
@@ -534,39 +569,104 @@ def getWireBox():
 # player press the button -> start
 @app.route('/startNineBlock', methods=['GET'])
 def startNineBlock():
+
+	# play sound effect
+	requests.get('http://192.168.50.210:5000/playThirdRoomNineBoxScan')
 	# start wheel running
 	requests.get('http://192.168.50.100/set_run?params=1')
+	# light into white (floar)
+	requests.get('http://192.168.50.70/set_breathing_light?params=0')
+	requests.get('http://192.168.50.70/set_color?params=FFFFFF')
+	# light into white (mask)
+	requests.get('http://192.168.50.19/set_breathing_light?params=0')
+	requests.get('http://192.168.50.19/set_color?params=FFFFFF')
+
+	
 	db.nineBlock.update({"name": "nineBlock"},{"$set": {"pushBtn": True}}, True)
 	return "start successfully"
-
-# player press the button -> stop
-@app.route('/stopNineBlock', methods=['GET'])
-def stopNineBlock():
-	# start wheel running
-	requests.get('http://192.168.50.100/set_run?params=0')
-	db.nineBlock.update({"name": "nineBlock"},{"$set": {"pushBtn": False}}, True)
-	return "stop successfully"
 
 # player perss the button and check correct answer
 @app.route('/checkNineBlock/<int:iscorrect>', methods=['GET'])
 def checkNineBlock(iscorrect):
+
 	if iscorrect == 0:
-		pass
+		# stop wheel
+		requests.get('http://192.168.50.100/set_run?params=0')
+		# light to red (floar)
+		requests.get('http://192.168.50.70/set_breathing_light?params=0')
+		requests.get('http://192.168.50.70/set_color?params=FF0000')
+		# light to red (mask)
+		requests.get('http://192.168.50.19/set_breathing_light?params=0')
+		requests.get('http://192.168.50.19/set_color?params=FF0000')
+		
+		time.sleep(5)
+
+		# light to breath (floar)
+		requests.get('http://192.168.50.70/set_breathing_light?params=1')
+		# light to breath (mask)
+		requests.get('http://192.168.50.19/set_breathing_light?params=1')
+
+		# update value to db and web
+		db.nineBlock.update({"name": "nineBlock"},{"$set": {"pushBtn": False}}, True)
+		
 	elif iscorrect == 1:
+		# stop wheel
+		requests.get('http://192.168.50.100/set_run?params=0')
+		# light to green (floar)
+		requests.get('http://192.168.50.70/set_breathing_light?params=0')
+		requests.get('http://192.168.50.70/set_color?params=00FF00')
+		# light to green (mask)
+		requests.get('http://192.168.50.19/set_breathing_light?params=0')
+		requests.get('http://192.168.50.19/set_color?params=00FF00')
+		# AI video
+		requests.get('http://192.168.50.218:5000/playFinishVideo')
+		# alert sound
+		requests.get("http://192.168.50.210:5000/playThirdRoomAlert")
+
+		# light off (floar)
+		requests.get('http://192.168.50.70/set_breathing_light?params=0')
+		requests.get('http://192.168.50.70/set_color?params=000000')
+		# light off (mask)
+		requests.get('http://192.168.50.19/set_breathing_light?params=0')
+		requests.get('http://192.168.50.19/set_color?params=000000')
+		# black video
+		requests.get('http://192.168.50.212:5000/playBlackVideo')
+		requests.get('http://192.168.50.217:5000/playBlackVideo')
+	
+
+		time.sleep(22)
+
+		# AI sound
+		requests.get('http://192.168.50.210:5000/playThirdRoomAIDefeated')
+
+		time.sleep(2)
+
+		# open Door(3)
+		requests.get("http://192.168.50.225:8888/openDoor/47/1")
+
+		time.sleep(2)
+
+		# open light
+		requests.get("http://192.168.50.225:8888/getPower/1")
+		# close AI noise
+		requests.get("http://192.168.50.210:5000/stopLoopPlayer") 
+		
+		# update value to db and web
+		db.nineBlock.update({"name": "nineBlock"},{"$set": {"correct": True}}, True)
+		
 		db.notifications.insert({
 			'_id': nextNotifications("productid"),
 			'avatarIcon': "BuildIcon_3",
 			'message': "(第三間房間) 九宮格 過關了！ ",
 			'time': time.strftime("%H:%M:%S", time.localtime()),
 		})
-		db.nineBlock.update({"name": "nineBlock"},{"$set": {"correct": True}}, True)
 	return "check successfully"
 
 # react get server
 @app.route('/NineBlock', methods=['GET'])
 def NineBlock():
 	try:
-		requests.get('http://192.168.50.212')
+		requests.get('http://192.168.50.20')
 	except requests.exceptions.RequestException as e:
 		db.nineBlock.update({"name": "nineBlock"},{"$set": {"isConnect": False}}, True)
 	else:
@@ -576,54 +676,201 @@ def NineBlock():
 		nineBlock_json = json.loads(json_util.dumps(nineBlock_json))
 		return jsonify(nineBlock_json)
 
-@app.route('/resetNineBlock/<bool: pushBtn>', methods=['GET'])
+@app.route('/resetNineBlock/<int:pushBtn>', methods=['GET'])
 def resetNineBlock(pushBtn):
-	db.nineBlock.update({"name": "nineBlock"},{"$set": {"correct": False}}, True)
+	if pushBtn==0:
+		db.nineBlock.update({"name": "nineBlock"},{"$set": {"correct": False}}, True)
+	if pushBtn==1:
+		db.nineBlock.update({"name": "nineBlock"},{"$set": {"correct": True}}, True)
 	return "0k"
+
+# Check RFID (60) for web
+@app.route('/checkRFID', methods=['GET'])
+def checkRFID():
+	try:
+		rfid = requests.get('http://192.168.50.63')
+	except requests.exceptions.RequestException as e:
+		db.rfid.find_one_and_update({"isOpen": {"$exists": True}}, {"$set": {"isConnect": False}})
+	else:
+		db.rfid.find_one_and_update({"isOpen": {"$exists": True}}, {"$set": {"isConnect": True}})
+	finally:
+		rfid_json = db.rfid.find({'isOpen': {'$exists': True}})
+		rfid_json = json.loads(json_util.dumps(rfid_json))
+		return jsonify(rfid_json)
+
+# reset RFID (60)
+@app.route('/resetRFID/<int:isOpen>', methods=['GET'])
+def resetRFID(isOpen):
+	if isOpen==0:
+		db.rfid.find_one_and_update({"isOpen": {"$exists": True}}, {"$set": {"isOpen": False}})
+		requests.get('http://192.168.50.63/set_reset?params=' + str(isOpen))
+	if isOpen==1:
+		db.rfid.find_one_and_update({"isOpen": {"$exists": True}}, {"$set": {"isOpen": True}})
+		requests.get('http://192.168.50.63/set_rese?params=' + str(isOpen))
+	return "0k"
+
+# Get RFID (60) for progress
+@app.route('/getRFID', methods=['GET'])
+def getRFID():
+	db.notifications.insert({
+	    '_id': nextNotifications("productid"),
+	    'avatarIcon': "BuildIcon_1",
+	    'message': "(第一間房間) RFID 打開了！ ",
+	    'time': time.strftime("%H:%M:%S", time.localtime()),
+	})
+	db.rfid.find_one_and_update({"isOpen": {"$exists": True}}, {"$set": {"isOpen": True}})
+
+	# 未定
+	# sound effect
+	# requests.get('http://192.168.50.210:5000/playSecondRoomWireBox')
+	# time.sleep(0.7)
+				
+	return "WierBox successfully"
+
+@app.route('/checkWarningLight', methods=['GET'])
+def checkWarningLight():
+	try:
+		warningLight = requests.get('http://192.168.50.91')
+	except requests.exceptions.RequestException as e:
+		db.warningLight.find_one_and_update({"isOpen": {"$exists": True}}, {"$set": {"isConnect": False}})
+	else:
+		db.warningLight.find_one_and_update({"isOpen": {"$exists": True}}, {"$set": {"isConnect": True}})
+	finally:
+		warningLight_json = db.warningLight.find({'isOpen': {'$exists': True}})
+		warningLight_json = json.loads(json_util.dumps(warningLight_json))
+		return jsonify(warningLight_json)
+
+# reset RFID (60)
+@app.route('/resetWarningLight/<int:isOpen>', methods=['GET'])
+def resetWarningLight(isOpen):
+	if isOpen==0:
+		db.warningLight.find_one_and_update({"isOpen": {"$exists": True}}, {"$set": {"isOpen": False}})
+		requests.get('http://192.168.50.91/set_light?params=' + str(isOpen))
+	if isOpen==1:
+		db.warningLight.find_one_and_update({"isOpen": {"$exists": True}}, {"$set": {"isOpen": True}})
+		requests.get('http://192.168.50.91/set_light?params=' + str(isOpen))
+	return "0k"
+
+# Get RFID (60) for progress
+@app.route('/getWarningLight', methods=['GET'])
+def getWarningLight():
+	db.notifications.insert({
+	    '_id': nextNotifications("productid"),
+	    'avatarIcon': "BuildIcon_3",
+	    'message': "(第三間房間) WarningLight 打開了！ ",
+	    'time': time.strftime("%H:%M:%S", time.localtime()),
+	})
+	db.warningLight.find_one_and_update({"isOpen": {"$exists": True}}, {"$set": {"isOpen": True}})	
+
+	return "warningLight successfully"
+
+@app.route('/checkGear', methods=['GET'])
+def checkGear():
+	try:
+		gear = requests.get('http://192.168.50.100')
+	except requests.exceptions.RequestException as e:
+		db.gear.find_one_and_update({"isOpen": {"$exists": True}}, {"$set": {"isConnect": False}})
+	else:
+		db.gear.find_one_and_update({"isOpen": {"$exists": True}}, {"$set": {"isConnect": True}})
+	finally:
+		gear_json = db.gear.find({'isOpen': {'$exists': True}})
+		gear_json = json.loads(json_util.dumps(gear_json))
+		return jsonify(gear_json)
+
+# reset RFID (60)
+@app.route('/resetGear/<int:isOpen>', methods=['GET'])
+def resetGear(isOpen):
+	if isOpen==0:
+		db.gear.find_one_and_update({"isOpen": {"$exists": True}}, {"$set": {"isOpen": False}})
+		requests.get('http://192.168.50.100/set_run?params=' + str(isOpen))
+	if isOpen==1:
+		db.gear.find_one_and_update({"isOpen": {"$exists": True}}, {"$set": {"isOpen": True}})
+		requests.get('http://192.168.50.100/set_run?params=' + str(isOpen))
+	return "0k"
+
+# Get RFID (60) for progress
+@app.route('/getGear', methods=['GET'])
+def getGear():
+	db.notifications.insert({
+	    '_id': nextNotifications("productid"),
+	    'avatarIcon': "BuildIcon_3",
+	    'message': "(第三間房間) Gear 打開了！ ",
+	    'time': time.strftime("%H:%M:%S", time.localtime()),
+	})
+	db.gear.find_one_and_update({"isOpen": {"$exists": True}}, {"$set": {"isOpen": True}})	
+
+	return "gear successfully"
 
 @app.route('/checkMergeVideo/<int:pid>', methods=['GET'])
 def checkMergeVideo(pid):
 	os.system('kill -9 ' + str(pid))
+	requests.get('http://192.168.50.217:5000/deleteMergeVideo')
 	requests.get('http://192.168.50.217:5000/downloadVideo')
 	return "kill pid successfully"
 
 # from db return All Screen State
 @app.route('/checkAllScreenState', methods=['GET'])
 def checkAllScreenState():
-	startIP, endIP = 213, 220
+	startIP, endIP = 212, 217
 
 	threads = []
 	for ip in range(startIP, endIP + 1):
 		request = "http://192.168.50." + str(ip) + ":5000/checkScreenState"
 		threads.append(threading.Thread(target = checkIPInThread, args = (ip, request, )))
-		threads[ip - 213].start()
+		threads[ip - 212].start()
 
 	for ip in range(startIP, endIP + 1):
-		threads[ip - 213].join()
+		threads[ip - 212].join()
 
 	result = db.screenState.find()
 	result = json.loads(json_util.dumps(result))
 	return jsonify(result)
 
+# !!! reset mongodb data
+@app.route('/resetALLDataState', methods=['GET'])
+def resetALLDataState():
+	os.system("python /home/micro/mushding-app/mongodb.py")
+	return "reset success"
+
+# !!! reset phone !!!
+@app.route('/resetPhoneState', methods=['GET'])
+def resetPhoneState():
+	os.system("python /home/micro/mushding-app/mongodb_phone.py")
+	return "reset success"
+
 # !!! reset Room state !!!
 @app.route('/resetRoomState/<int:room>', methods=['GET'])
 def resetRoomState(room):
 	if room == 3:
-		pass
+		# light off (floar)
+		requests.get('http://192.168.50.70/set_breathing_light?params=0')
+		requests.get('http://192.168.50.70/set_color?params=000000')
+		# set btn off
+		requests.get('http://192.168.50.20/set_btn?params=0')
+		# set light paper off
+		requests.get('http://192.168.50.90/set_light?params=0')
+		# reset usb first
+		requests.get('http://192.168.50.218:5000/resetFirstUsb')
+		# light off (mask)
+		requests.get('http://192.168.50.19/set_breathing_light?params=0')
+		requests.get('http://192.168.50.19/set_color?params=000000')
 	elif room == 2:
 		# Close All Drawer
 		for ip in range(40, 43):
-			requests.get('http://192.168.50.225:8888/openDrawer/' + ip + '/0')
+			requests.get('http://192.168.50.225:8888/openDrawer/' + str(ip) + '/0')
 
 		# reset wireBox and coffin
-		requests.get('http://192.168.50.225:8888/resetWireBox')
-		requests.get('http://192.168.50.225:8888/resetCoffin')
+		requests.get('http://192.168.50.225:8888/resetWireBox/0')
+		requests.get('http://192.168.50.225:8888/resetCoffin/0')
 
 		# reset calculator
 		requests.get('http://192.168.50.211:5000/calculator/11')
+		requests.get('http://192.168.50.211:5000/reboot')
 	elif room == 1:
 		# Close Light
 		requests.get('http://192.168.50.225:8888/getPower/0')
+		# Close RFID
+		requests.get('http://192.168.50.225:8888/resetRFID/0')
 
 	return "test"
 
@@ -676,29 +923,29 @@ def startContinue():
 	result = json.loads(json_util.dumps(result))
 	return "set successfully"
 	
-# return song information
-@app.route('/checkSongIndex', methods=['GET'])
-def checkSongIndex():
-	# check progress
-	try:
-		result = requests.get('http://192.168.50.210:5000/checkPosition')
-	except requests.exceptions.RequestException as e:
-		print(e)
-		result = db.youtubeSongIndex.find({'playNowIndex': {'$exists': True}})
-		result = json.loads(json_util.dumps(result))
-		return jsonify(result)
+# return song information		TODO:  modify this
+# @app.route('/checkSongIndex', methods=['GET'])
+# def checkSongIndex():
+# 	# check progress
+# 	try:
+# 		result = requests.get('http://192.168.50.210:5000/checkPosition')
+# 	except requests.exceptions.RequestException as e:
+# 		print(e)
+# 		result = db.youtubeSongIndex.find({'playNowIndex': {'$exists': True}})
+# 		result = json.loads(json_util.dumps(result))
+# 		return jsonify(result)
 
-	duration = result.json()['duration']
-	position = result.json()['position']
-	percentages = 0
-	if duration != 0:
-		percentages = 100 * float(position)/float(duration)
+# 	duration = result.json()['duration']
+# 	position = result.json()['position']
+# 	percentages = 0
+# 	if duration != 0:
+# 		percentages = 100 * float(position)/float(duration)
 
-	result = db.youtubeSongIndex.find_one_and_update({'nowProgress': {'$exists': True}}, {"$set": {"nowProgress": percentages}})
+# 	result = db.youtubeSongIndex.find_one_and_update({'nowProgress': {'$exists': True}}, {"$set": {"nowProgress": percentages}})
 
-	result = db.youtubeSongIndex.find({'playNowIndex': {'$exists': True}})
-	result = json.loads(json_util.dumps(result))
-	return jsonify(result)
+# 	result = db.youtubeSongIndex.find({'playNowIndex': {'$exists': True}})
+# 	result = json.loads(json_util.dumps(result))
+# 	return jsonify(result)
 
 # update next Song
 @app.route('/nextSongIndex/<int:index>', methods=['GET'])
@@ -751,27 +998,27 @@ def deleteYoutubeSongList(index):
 	db.youtubeSongList.remove({})	
 	return "delete successfully"
 
-# insert new song into DB
-@app.route('/checkYoutubeSongList', methods=['GET'])
-def checkYoutubeSongList():
-	result = db.youtubeSongIndex.find({'sequence_value': {'$exists': True}})
-	result = json.loads(json_util.dumps(result))
+# insert new song into DB				TODO:    modify
+# @app.route('/checkYoutubeSongList', methods=['GET'])
+# def checkYoutubeSongList():
+# 	result = db.youtubeSongIndex.find({'sequence_value': {'$exists': True}})
+# 	result = json.loads(json_util.dumps(result))
 	
-	try:
-		result = requests.get("http://192.168.50.210:5000/checkYoutubeDLList")
-	except requests.exceptions.RequestException as e:
-		print(e)
-		result = db.youtubeSongList.find({'index': {'$exists': True}})
-		result = json.loads(json_util.dumps(result))
-		return jsonify(result)
+# 	try:
+# 		result = requests.get("http://192.168.50.210:5000/checkYoutubeDLList")
+# 	except requests.exceptions.RequestException as e:
+# 		print(e)
+# 		result = db.youtubeSongList.find({'index': {'$exists': True}})
+# 		result = json.loads(json_util.dumps(result))
+# 		return jsonify(result)
 
-	db.youtubeSongList.remove({})	
-	if result.json() != []:
-		db.youtubeSongList.insert(result.json())
+# 	db.youtubeSongList.remove({})	
+# 	if result.json() != []:
+# 		db.youtubeSongList.insert(result.json())
 
-	result = db.youtubeSongList.find({'index': {'$exists': True}})
-	result = json.loads(json_util.dumps(result))
-	return jsonify(result)
+# 	result = db.youtubeSongList.find({'index': {'$exists': True}})
+# 	result = json.loads(json_util.dumps(result))
+# 	return jsonify(result)
 
 # Phone Series
 
@@ -811,6 +1058,9 @@ def getFirstRoomPassword():
 	# turn Camera to second room
 	time.sleep(2)
 	requests.get("http://192.168.50.225:8888/setFirstRoomCamera/3")
+
+	# turn off yolo
+	requests.get('http://192.168.50.225:8888/killFirstRoomCamera')
 
 	return "password get successfully"
 
@@ -883,7 +1133,7 @@ def checkRoom1():
 	firstRoomPower_json = json.loads(json_util.dumps(firstRoomPower_json))
 	data["firstRoomPower"]=firstRoomPower_json[0]["isOpen"]
 
-	RFID_json = db.RFID.find({"name": "RFID"})
+	RFID_json = db.rfid.find({"name": "rfid"})
 	RFID_json = json.loads(json_util.dumps(RFID_json))
 	data["RFID"]=RFID_json[0]["isOpen"]
 
@@ -921,7 +1171,7 @@ def checkC():
 
 	phone_json = db.phoneTotalState.find()
 	phone_json = json.loads(json_util.dumps(phone_json))
-	data["poano"]=phone_json[1]["videoPianoSheetC"]
+	data["piano"]=phone_json[1]["videoPianoSheetC"]
 
 	calculator_json = db.calculator.find()
 	calculator_json = json.loads(json_util.dumps(calculator_json))
@@ -943,7 +1193,7 @@ def checkD():
 
 	phone_json = db.phoneTotalState.find()
 	phone_json = json.loads(json_util.dumps(phone_json))
-	data["moneyBook"]=phone_json[0]["documentInterviewD"]
+	data["moneyBook"]=phone_json[2]["tipAccountBook"]
 
 	write_json = db.secondRoomWritingCamera.find()
 	write_json = json.loads(json_util.dumps(write_json))
@@ -972,6 +1222,9 @@ def checkRoom2():
 @app.route('/checkRoom3', methods=['GET'])
 def checkRoom3():
 	data={}
+	nineBlock_json=db.nineBlock.find()
+	nineBlock_json=json.loads(json_util.dumps(nineBlock_json))
+	data["nineBlock"]=nineBlock_json[0]["correct"]
 	return data
 @app.route('/checkVideo')
 

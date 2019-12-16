@@ -73,8 +73,7 @@ function ColorlibStepIcon(props) {
   const { active, completed } = props;
 
   const icons = {
-    1: <UsbIcon />,
-    2: <AppsIcon />,
+    1: <AppsIcon />,
   };
 
   return (
@@ -96,7 +95,7 @@ ColorlibStepIcon.propTypes = {
 };
 
 function getSteps() {
-  return (['USB','九宮格']);
+  return (['九宮格']);
 }
 
 function getStepContent(step) {
@@ -160,8 +159,7 @@ export default function HorizontalNonLinearStepper() {
         if(response.data){
           // console.log(data);
           const newCompleted = completed;
-          newCompleted[0] = 0;
-          newCompleted[1] = 0;
+          newCompleted[0] = data["nineBlock"];
           setCompleted(newCompleted);
           // this.setState(
           //   {

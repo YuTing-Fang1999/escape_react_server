@@ -111,7 +111,7 @@ class OpenDrawer extends Component {
                         </div>
                         <div className="return_json">
                             <h2 className={classes.testMargin}>name/IP： {dock_1.name}/{dock_1.ip}</h2>
-                            <h2 className={classes.testMargin}>lock： {dock_1.variables && dock_1.variables.lock}</h2>
+                            <h2 className={classes.testMargin}>open： {dock_1.variables && dock_1.variables.lock}</h2>
                             <h2 className={classes.testMargin}>isConnected： {String(!dock_1.error)}</h2>
                         </div>
                     </Paper>
@@ -127,7 +127,7 @@ class OpenDrawer extends Component {
                         </div>
                         <div className="return_json">
                             <h2 className={classes.testMargin}>name/IP： {dock_2.name}/{dock_2.ip}</h2>
-                            <h2 className={classes.testMargin}>lock： {dock_2.variables && dock_2.variables.lock}</h2>
+                            <h2 className={classes.testMargin}>open： {dock_2.variables && dock_2.variables.lock}</h2>
                             <h2 className={classes.testMargin}>isConnected： {String(!dock_2.error)}</h2>
                         </div>
                     </Paper>
@@ -143,7 +143,7 @@ class OpenDrawer extends Component {
                         </div>
                         <div className="return_json">
                             <h2 className={classes.testMargin}>name/IP： {dock_3.name}/{dock_3.ip}</h2>
-                            <h2 className={classes.testMargin}>lock： {dock_3.variables && dock_3.variables.lock}</h2>
+                            <h2 className={classes.testMargin}>open： {dock_3.variables && dock_3.variables.lock}</h2>
                             <h2 className={classes.testMargin}>isConnected： {String(!dock_3.error)}</h2>
                         </div>
                     </Paper>

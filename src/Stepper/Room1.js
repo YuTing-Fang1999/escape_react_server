@@ -97,7 +97,7 @@ ColorlibStepIcon.propTypes = {
 };
 
 function getSteps() {
-  return (['燈', 'NFC','手機解鎖']);
+  return (['燈', 'RFID','手機解鎖']);
 }
 
 function getStepContent(step) {

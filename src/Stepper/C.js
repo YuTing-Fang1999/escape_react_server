@@ -11,11 +11,10 @@ import StepConnector from '@material-ui/core/StepConnector';
 import { withStyles } from '@material-ui/core/styles';
 
 import PanoramaIcon from '@material-ui/icons/Panorama';
-import ReceiptIcon from '@material-ui/icons/Receipt';
-import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
-import AllInboxIcon from '@material-ui/icons/AllInbox';
 import MusicVideoIcon from '@material-ui/icons/MusicVideo';
 import AppsIcon from '@material-ui/icons/Apps';
+import DnsIcon from '@material-ui/icons/Dns';
+import DialpadIcon from '@material-ui/icons/Dialpad';
 
 
 const useStyles = makeStyles(theme => ({
@@ -88,8 +87,8 @@ function ColorlibStepIcon(props) {
   const icons = {
     1: <PanoramaIcon />,
     2: <MusicVideoIcon />,
-    3: <AppsIcon />,
-    4: <AllInboxIcon/>
+    3: <DialpadIcon />,
+    4: <DnsIcon/>
   };
 
   return (
@@ -111,7 +110,7 @@ ColorlibStepIcon.propTypes = {
 };
 
 function getSteps() {
-  return (['手機掃描照片','手機掃描鋼琴譜', '計算機', '抽屜']);
+  return (['對話紀錄','手機掃描鋼琴譜', '計算機', '抽屜']);
 }
 
 function getStepContent(step) {

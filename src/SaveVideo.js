@@ -268,6 +268,7 @@ class SaveVideo extends React.Component {
     render() {
     return(
     <div>
+      <br></br>
       <Stepper nonLinear activeStep={null} alternativeLabel connector={<ColorlibConnector />}>
             {this.getSteps().map((label, index) => (
               <Step key={label}>
@@ -277,40 +278,6 @@ class SaveVideo extends React.Component {
               </Step>
             ))}
       </Stepper>
-      <Grid container spacing={1}>
-        <Grid item xs>
-            <Paper>
-                <h4>name : V1</h4>   {/*adding space*/}
-                <h4>outputA : &nbsp;&nbsp;{this.exists(this.state.outputA)}</h4>
-                <h4>frame_person_A:&nbsp;{this.exists(this.state.frame_person_A)}</h4>
-                <br/>
-            </Paper>
-        </Grid>
-        <Grid item xs>
-            <Paper>
-                <h4>name : V2</h4>   {/*adding space*/}
-                <h4>outputB : &nbsp;&nbsp;{this.exists(this.state.outputB)}</h4>
-                <h4>frame_person_B:&nbsp;{this.exists(this.state.frame_person_B)}</h4>
-                <br/>
-            </Paper>
-        </Grid>
-        <Grid item xs>
-            <Paper>
-                <h4>name : V3</h4>   {/*adding space*/}
-                <h4>outputC : &nbsp;{this.exists(this.state.outputC)}</h4>
-                <h4>frame_person_C:&nbsp;{this.exists(this.state.frame_person_C)}</h4>
-                <br/>
-            </Paper>
-        </Grid>
-        <Grid item xs>
-            <Paper>
-                <h4>name : V4</h4>   {/*adding space*/}
-                <h4>outputD : &nbsp;&nbsp;{this.exists(this.state.outputD)}</h4>
-                <h4>frame_person_D:&nbsp;{this.exists(this.state.frame_person_D)}</h4>
-                <br/>
-            </Paper>
-        </Grid>
-      </Grid>
       <Dialog
         open={this.state.open}
         onClose={()=>{this.setState({open: false})}}

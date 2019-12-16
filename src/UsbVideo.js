@@ -80,31 +80,35 @@ class UsbVideo extends Component {
     controlUsb(index, isOpen){
         if (index === 1){
             axios
-                .get("http://192.168.50.212:5000/forcePlayUSB/1")
+                .get("http://192.168.50.218:5000/forcePlayUSB/1")
         }
         else if (index === 2){
             axios
-                .get("http://192.168.50.212:5000/forcePlayUSB/2")
+                .get("http://192.168.50.218:5000/forcePlayUSB/2")
         }
         else if (index === 3){
             axios
-                .get("http://192.168.50.212:5000/forcePlayUSB/3")
+                .get("http://192.168.50.218:5000/forcePlayUSB/3")
         }
         else if (index === 4){
             axios
-                .get("http://192.168.50.212:5000/forcePlayUSB/4")
+                .get("http://192.168.50.218:5000/forcePlayUSB/4")
         }
         else if (index === 5){
             axios
-                .get("http://192.168.50.212:5000/playBlackVideo")
+                .get("http://192.168.50.218:5000/playBlackVideo")
         }
         else if (index === 6){
             axios
-                .get("http://192.168.50.212:5000/playFinishVideo")
+                .get("http://192.168.50.218:5000/playFinishVideo")
         }
         else if (index === 7){
             axios
-                .get("http://192.168.50.212:5000/stopPlaying")
+                .get("http://192.168.50.218:5000/stopPlaying")
+        }
+        else if (index === 8){
+            axios
+                .get("http://192.168.50.218:5000/resetFirstUsb")
         }
     }
     // Snackbar close here
@@ -143,6 +147,9 @@ class UsbVideo extends Component {
                     </Button>
                     <Button className={classes.buttonMargin} variant="contained" color="primary" onClick={this.controlUsb.bind(this, 7)}>
                         停止播放
+                    </Button>
+                    <Button className={classes.buttonMargin} variant="contained" color="secondary" onClick={this.controlUsb.bind(this, 8)}>
+                        清空第一次播放
                     </Button>
                 </div>
                 <br/>

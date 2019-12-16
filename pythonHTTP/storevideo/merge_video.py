@@ -15,13 +15,14 @@ def merge(cap, output_file_name):
     # out = cv2.VideoWriter(output_file_name, fourcc, 20.0, (640, 360))
     coordinate = [(0, 0), (0, width), (height, 0), (height, width)]
     cnt = 0
-    while cap[0].isOpened():
+    while cnt < 20*30 :
         Frame = np.zeros([height*2, width*2, 3], dtype=np.uint8)
         for i in range(4):
             ret, sub_frame = cap[i].read()
             if ret == False:
-                out.release()
-                return
+                continue
+                # out.release()
+                # return
             Frame[coordinate[i][0]:coordinate[i][0]+360, coordinate[i][1]:coordinate[i][1]+640] = sub_frame
         print(cnt)
         cnt+=1

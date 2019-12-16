@@ -9,7 +9,7 @@ import time
 import requests
 from mnist_model import LeNet, predict
 import argparse
-from check_cycle import check_cycle
+from check_cycle import have_cycle
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -20,8 +20,9 @@ if __name__ == '__main__':
     parser.add_argument('--y2',  default=701,  type=int)
     parser.add_argument('--len2',default=130,  type=int)
     args = parser.parse_args()
-
+    print('loading model')
     net = torch.load('/home/micro/mushding-app/mnist/model/mnist_model_128_10.pth')
+    print('loaded successed')
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     net.to(device)
     print(net)
@@ -34,10 +35,11 @@ if __name__ == '__main__':
             month_img, day_img = getimage(args.x1, args.y1, args.len1, args.x2, args.y2, args.len2)
             month = predict( biamp(month_img), net )
             day = predict( biamp(day_img), net )
-            if not check_cycle( month_img ):
+            if have_cycle( biamp(month_img) ):
                 month = -2
-            if not check_cycle( day_img ):
+            if have_cycle( biamp(day_img) ):
                 day = -2
+
 
             print(month,'/',day, ' count = ', count, sep="")
             requests.get('http://192.168.50.225:8888/checkWritingCamera/'+str(month)+'/'+str(day))

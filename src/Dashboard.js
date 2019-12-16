@@ -8,6 +8,7 @@ import Button from '@material-ui/core/Button';
 import MySnackbarContentWrapper from './CustomizedSnackbars'
 import Snackbar from '@material-ui/core/Snackbar';
 import MainStepper from './Stepper/MainStepper'
+import SaveVideo from './SaveVideo'
 
 const styles = theme => ({
     buttonMargin: {
@@ -42,6 +43,7 @@ class Dashboard extends Component {
         }
         this.handleResetAllButton = this.handleResetAllButton.bind(this)
         this.handleResetButton = this.handleResetButton.bind(this)
+        this.handleResetDataButton = this.handleResetDataButton.bind(this)
     }
     componentDidMount() { 
 
@@ -52,10 +54,41 @@ class Dashboard extends Component {
     handleResetButton(room){
         axios
             .get('http://192.168.50.225:8888/resetRoomState/' + String(room))
+            if(room==1){
+                axios
+                    .get('http://192.168.50.213:5000/playBlackVideo')
+            }
+            if(room==2){
+                axios
+                    .get('http://192.168.50.214:5000/playBlackVideo')
+                axios
+                    .get('http://192.168.50.215:5000/playBlackVideo')
+                axios
+                    .get('http://192.168.50.216:5000/playBlackVideo')
+            }
+            if(room==3){
+                axios
+                    .get('http://192.168.50.212:5000/playBlackVideo')
+
+                axios
+                    .get('http://192.168.50.217:5000/playBlackVideo')
+                axios
+                    .get('http://192.168.50.218:5000/usb/4/1')
+            }
     }
     handleResetAllButton(){
         axios
             .get('http://192.168.50.225:8888/resetALLState')
+    }
+    handleResetDataButton(index){
+        if (index == 0){
+            axios
+                .get('http://192.168.50.225:8888/resetALLDataState')
+        }
+        else if (index == 1){
+            axios
+                .get('http://192.168.50.225:8888/resetPhoneState')
+        }
     }
     // Snackbar close here
     snackClose(){
@@ -87,6 +120,15 @@ class Dashboard extends Component {
                 </div>
                 <br/>
                 <div>
+                    <Button className={classes.buttonMargin} variant="contained" onClick={this.handleResetDataButton.bind(this, 0)}>
+                        重設機關資料庫
+                    </Button>
+                    <Button className={classes.buttonMargin} variant="contained" onClick={this.handleResetDataButton.bind(this, 1)}>
+                        重設手機資料庫
+                    </Button>
+                </div>
+                <br/>
+                <div>
                     <Button className={classes.buttonMargin} variant="contained" onClick={this.handleResetAllButton}>
                         重新設定所有伺服器(危險！)
                     </Button>
@@ -110,6 +152,7 @@ class Dashboard extends Component {
                 message={<span id="message-id">{this.state.snackbarContent}</span>}
             />
             </Snackbar>
+            <SaveVideo/>
         </div>
       );
     }

@@ -13,6 +13,7 @@ import { withStyles } from '@material-ui/core/styles';
 import MenuBookIcon from '@material-ui/icons/MenuBook';
 import InboxIcon from '@material-ui/icons/Inbox';
 import AllInboxIcon from '@material-ui/icons/AllInbox';
+import DnsIcon from '@material-ui/icons/Dns';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -82,7 +83,7 @@ function ColorlibStepIcon(props) {
   const icons = {
     1: <MenuBookIcon />,
     2: <InboxIcon />,
-    3: <AllInboxIcon />,
+    3: <DnsIcon />,
   };
 
   return (

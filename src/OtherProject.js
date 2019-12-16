@@ -87,6 +87,9 @@ class OtherProject extends Component {
             wireBoxOpen: {},
             coffinOpen: {},
             nineBlock: {},
+            warningLight: {},
+            gear: {},
+            RFID: {},
             writingCamera: {},
             lightError: false,
 
@@ -106,6 +109,9 @@ class OtherProject extends Component {
         this.controlWireBox = this.controlWireBox.bind(this)
         this.controlCoffin = this.controlCoffin.bind(this)
         this.controlNineBlock = this.controlNineBlock.bind(this)
+        this.controlRFID = this.controlRFID.bind(this)
+        this.controlWarningLight = this.controlWarningLight.bind(this)
+        this.controlGear = this.controlGear.bind(this)
         this.handleLightColorContinueFloar = this.handleLightColorContinueFloar.bind(this)
         this.handleLightColorCompleteFloar = this.handleLightColorCompleteFloar.bind(this)
         this.handleLightColorContinueMask = this.handleLightColorContinueMask.bind(this)
@@ -156,8 +162,36 @@ class OtherProject extends Component {
             .get('http://192.168.50.225:8888/NineBlock')
             .then(response => {
                 let data = response.data;
+                // console.log(data)
                 this.setState({
-                    nineBlockOpen: data[0]
+                    nineBlock: data[0]
+                })
+            })
+        axios
+            .get('http://192.168.50.225:8888/checkRFID')
+            .then(response => {
+                let data = response.data;
+                // console.log(data)
+                this.setState({
+                    RFID: data[0]
+                })
+            })
+        axios
+            .get('http://192.168.50.225:8888/checkWarningLight')
+            .then(response => {
+                let data = response.data;
+                // console.log(data)
+                this.setState({
+                    warningLight: data[0]
+                })
+            })
+        axios
+            .get('http://192.168.50.225:8888/checkGear')
+            .then(response => {
+                let data = response.data;
+                // console.log(data)
+                this.setState({
+                    gear: data[0]
                 })
             })
     }
@@ -172,6 +206,10 @@ class OtherProject extends Component {
     controlPower(isOpen){
         axios
             .get('http://192.168.50.225:8888/getPower/' + isOpen)
+    }
+    controlOnlyLight(isOpen){
+        axios
+            .get('http://192.168.50.225:8888/getOnlyLight/' + isOpen)
     }
     controlCamera(isOpen){
         if (isOpen === 0){
@@ -201,9 +239,44 @@ class OtherProject extends Component {
         axios
             .get('http://192.168.50.225:8888/resetCoffin/' + isOpen)
     }
-    controlNineBlock(pushBtn){
+    controlNineBlock(isOpen){
+        if (isOpen == 0){
+            axios
+                .get('http://192.168.50.225:8888/firstUsb')
+        }
+        else if (isOpen == 1){
+            axios
+                .get('http://192.168.50.225:8888/startNineBlock')
+        }
+        else if (isOpen == 2){
+            axios
+                .get('http://192.168.50.225:8888/checkNineBlock/0')
+        }
+        else if (isOpen == 3){
+            axios
+                .get('http://192.168.50.20/set_btn?params=0')
+        }
+    }
+    controlRFID(isOpen){
         axios
-            .get('http://192.168.50.225:8888/resetNineBlock/' + pushBtn)
+            .get('http://192.168.50.225:8888/resetRFID/' + isOpen)
+            .then(res => {
+                // console.log(res)
+            })
+    }
+    controlWarningLight(isOpen){
+        axios
+            .get('http://192.168.50.225:8888/resetWarningLight/' + isOpen)
+            .then(res => {
+                // console.log(res)
+            })
+    }
+    controlGear(isOpen){
+        axios
+            .get('http://192.168.50.225:8888/resetGear/' + isOpen)
+            .then(res => {
+                // console.log(res)
+            })
     }
     handleLightColorCompleteFloar = (color, event) => {
         this.setState({
@@ -321,6 +394,13 @@ class OtherProject extends Component {
                         <Button className={classes.buttonMargin} variant="contained" color="secondary" onClick={this.controlPower.bind(this, 0)}>
                             Set Close
                         </Button> 
+                        <br></br>
+                        <Button className={classes.buttonMargin} variant="contained" color="primary" onClick={this.controlOnlyLight.bind(this, 1)}>
+                            ONLY Open Light
+                        </Button>
+                        <Button className={classes.buttonMargin} variant="contained" color="secondary" onClick={this.controlOnlyLight.bind(this, 0)}>
+                            ONLY Close Light
+                        </Button> 
                     </div>
                     <h2 className={classes.textMargin} >isOpen：{this.state.powerOpen.isOpen}</h2>
                     <h2 className={classes.textMargin} >isConnected：{String(!this.state.powerOpen.error)}</h2>
@@ -346,6 +426,16 @@ class OtherProject extends Component {
                 <br/>
                 <Paper className={fixedHeightPaper}>
                     <h2 className={classes.textMargin}>四張卡片 NFC</h2>
+                    <div>
+                        {/* <Button className={classes.buttonMargin} variant="contained" color="primary" onClick={this.controlRFID.bind(this, 1)}>
+                            Set Open
+                        </Button> */}
+                        <Button className={classes.buttonMargin} variant="contained" color="secondary" onClick={this.controlRFID.bind(this, 0)}>
+                            Set Close
+                        </Button> 
+                    </div>
+                    <h2 className={classes.textMargin} >isOpen：{String(this.state.RFID.isOpen)}</h2>
+                    <h2 className={classes.textMargin} >isConnected：{String(this.state.RFID.isConnect)}</h2>
                 </Paper>
             </TabPanel>
             <TabPanel value={this.state.tabValue} index={1}>
@@ -380,7 +470,7 @@ class OtherProject extends Component {
                             Set Close
                         </Button> 
                     </div>
-                    <h2 className={classes.textMargin} >isOpen：{this.state.wireBoxOpen.isOpen}</h2>
+                    <h2 className={classes.textMargin} >isCorrect：{this.state.wireBoxOpen.isOpen}</h2>
                     <h2 className={classes.textMargin} >isConnected：{String(!this.state.wireBoxOpen.error)}</h2>
                 </Paper>
             </TabPanel>
@@ -388,16 +478,50 @@ class OtherProject extends Component {
                 <Paper className={fixedHeightPaper}>
                     <h2 className={classes.textMargin}>九宮格</h2>
                     <div>
-                        <Button className={classes.buttonMargin} variant="contained" color="primary" onClick={this.controlNineBlock.bind(this, true)}>
-                            Set Correct
+                        <Button className={classes.buttonMargin} variant="contained" color="primary" onClick={this.controlNineBlock.bind(this, 0)}>
+                            第一個 USB 插入後的流程
                         </Button>
-                        <Button className={classes.buttonMargin} variant="contained" color="secondary" onClick={this.controlNineBlock.bind(this, false)}>
-                            Set Wrong
+                        <Button className={classes.buttonMargin} variant="contained" color="secondary" onClick={this.controlNineBlock.bind(this, 1)}>
+                            按下按鈕後的流程
+                        </Button>
+                        <Button className={classes.buttonMargin} variant="contained" color="primary" onClick={this.controlNineBlock.bind(this, 2)}>
+                            停止掃描中的流程
+                        </Button>
+                        <Button className={classes.buttonMargin} variant="contained" color="secondary" onClick={this.controlNineBlock.bind(this, 3)}>
+                            把紅按鈕關掉
                         </Button> 
                     </div>
-                    <h2 className={classes.textMargin} >isPushBtn：{this.state.nineBlock.pushBtn}</h2>
-                    <h2 className={classes.textMargin} >isCorrect：{this.state.nineBlock.correct}</h2>
-                    <h2 className={classes.textMargin} >isConnected：{String(!this.state.nineBlock.isConnect)}</h2>
+                    <h2 className={classes.textMargin} >isPushBtn：{String(this.state.nineBlock.pushBtn)}</h2>
+                    <h2 className={classes.textMargin} >isCorrect：{String(this.state.nineBlock.correct)}</h2>
+                    <h2 className={classes.textMargin} >isConnected：{String(this.state.nineBlock.isConnect)}</h2>
+                </Paper>
+                <br/>
+                <Paper className={fixedHeightPaper}>
+                    <h2 className={classes.textMargin}>警示燈</h2>
+                    <div>
+                        <Button className={classes.buttonMargin} variant="contained" color="primary" onClick={this.controlWarningLight.bind(this, 1)}>
+                            Set Open
+                        </Button>
+                        <Button className={classes.buttonMargin} variant="contained" color="secondary" onClick={this.controlWarningLight.bind(this, 0)}>
+                            Set Close
+                        </Button> 
+                    </div>
+                    <h2 className={classes.textMargin} >isOpen：{String(this.state.warningLight.isOpen)}</h2>
+                    <h2 className={classes.textMargin} >isConnected：{String(this.state.warningLight.isConnect)}</h2>
+                </Paper>
+                <br/>
+                <Paper className={fixedHeightPaper}>
+                    <h2 className={classes.textMargin}>齒輪</h2>
+                    <div>
+                        <Button className={classes.buttonMargin} variant="contained" color="primary" onClick={this.controlGear.bind(this, 1)}>
+                            Set Open
+                        </Button>
+                        <Button className={classes.buttonMargin} variant="contained" color="secondary" onClick={this.controlGear.bind(this, 0)}>
+                            Set Close
+                        </Button> 
+                    </div>
+                    <h2 className={classes.textMargin} >isOpen：{String(this.state.gear.isOpen)}</h2>
+                    <h2 className={classes.textMargin} >isConnected：{String(this.state.gear.isConnect)}</h2>
                 </Paper>
                 <br/>
                 <Paper className={fixedHeightPaper}>

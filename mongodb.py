@@ -150,6 +150,11 @@ notifications = [
 
 screenState = [
 	{
+		"ip": "212",
+		"isPlaying": "stop",
+		"isConnect": False,
+	},
+	{
 		"ip": "213",
 		"isPlaying": "stop",
 		"isConnect": False,
@@ -174,21 +179,6 @@ screenState = [
 		"isPlaying": "stop",
 		"isConnect": False,
 	},
-	{
-		"ip": "218",
-		"isPlaying": "stop",
-		"isConnect": False,
-	},
-	{
-		"ip": "219",
-		"isPlaying": "stop",
-		"isConnect": False,
-	},
-	{
-		"ip": "220",
-		"isPlaying": "stop",
-		"isConnect": False,
-	},
 ]
 
 # time of saving vedio
@@ -208,9 +198,10 @@ videoState={
 }
 
 #RFID
-RFID={
-	"name": "RFID",
+rfid={
+	"name": "rfid",
 	"isOpen": False,
+	"isConnect": False,
 }
 
 password={
@@ -225,6 +216,15 @@ nineBlock={
 	"correct": False,
 }
 
+warningLight={
+	"isOpen": False,
+	"isConnect": False,
+}
+
+gear={
+	"isOpen": False,
+	"isConnect": False,
+}
 # <=========================================>
 
 menuListState = {							# website menuList state
@@ -247,9 +247,9 @@ youtubeSongList = [
 
 # <=========================================>
 
-phoneLikesNum = {
-	'likes': 0,
-}
+# phoneLikesNum = {
+# 	'likes': 0,
+# }
 
 phoneTotalState = [
 	{
@@ -338,9 +338,9 @@ collection = db.phoneTotalState
 result = collection.remove({})
 result = collection.insert(phoneTotalState)
 
-collection = db.phoneLikesNum
-result = collection.remove({})
-result = collection.insert(phoneLikesNum)
+# collection = db.phoneLikesNum
+# result = collection.remove({})
+# result = collection.insert(phoneLikesNum)
 
 # <=========================================>
 
@@ -354,9 +354,9 @@ collection = db.videoState
 result = collection.remove({})
 result = collection.insert(videoState)
 
-collection = db.RFID
+collection = db.rfid
 result = collection.remove({})
-result = collection.insert(RFID)
+result = collection.insert(rfid)
 
 collection = db.password
 result = collection.remove({})
@@ -365,3 +365,12 @@ result = collection.insert(password)
 collection = db.nineBlock
 result = collection.remove({})
 result = collection.insert(nineBlock)
+
+collection = db.warningLight
+result = collection.remove({})
+result = collection.insert(warningLight)
+
+collection = db.gear
+result = collection.remove({})
+result = collection.insert(gear)
+

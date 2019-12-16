@@ -57,7 +57,7 @@ class Calculator extends Component {
             .get('http://192.168.50.225:8888/checkCalculator')
             .then(response => {
                 let data = response.data[0]; // return value is a list
-                console.log(data)
+                // console.log(data)
                 this.setState({ // every 2 sec setState
                     note_array: data.note_array,
                     isAnswer: data.isAnswer,

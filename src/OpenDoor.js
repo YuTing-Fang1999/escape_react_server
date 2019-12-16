@@ -40,6 +40,7 @@ class OpenDoor extends Component {
             variant: "error",
         }
         this.controlDoor = this.controlDoor.bind(this);
+        this.controlOnlyDoor = this.controlOnlyDoor.bind(this);
     }
     componentDidMount() { // per two second update
         this.timerID = setInterval(
@@ -74,9 +75,18 @@ class OpenDoor extends Component {
         axios
             .get('http://192.168.50.225:8888/openDoor/' + String(ip) + '/' + String(isOpen))
             .then(response => {
-                this.setState({
+                // this.setState({
 
-                })
+                // })
+            })
+    }
+    controlOnlyDoor(ip, isOpen) {
+        axios
+            .get('http://192.168.50.225:8888/openOnlyDoor/' + String(ip) + '/' + String(isOpen))
+            .then(response => {
+                // this.setState({
+
+                // })
             })
     }
     // Snackbar close here
@@ -108,6 +118,13 @@ class OpenDoor extends Component {
                             <Button className={classes.buttonMargin} variant="contained" color="secondary" onClick={this.controlDoor.bind(this, 45, 0)}>
                                 Close Door 1
                             </Button> 
+                            <br></br>
+                            <Button className={classes.buttonMargin} variant="contained" color="primary" onClick={this.controlOnlyDoor.bind(this, 45, 1)}>
+                                ONLY Open Door 1
+                            </Button>
+                            <Button className={classes.buttonMargin} variant="contained" color="secondary" onClick={this.controlOnlyDoor.bind(this, 45, 0)}>
+                                ONLY Close Door 1
+                            </Button> 
                         </div>
                         <div className="return_json">
                             <h2 className={classes.testMargin}>name/IP： {door_1.name}/{door_1.ip}</h2>
@@ -124,6 +141,13 @@ class OpenDoor extends Component {
                             <Button className={classes.buttonMargin} variant="contained" color="secondary" onClick={this.controlDoor.bind(this, 46, 0)}>
                                 Close Door 2
                             </Button> 
+                            <br></br>
+                            <Button className={classes.buttonMargin} variant="contained" color="primary" onClick={this.controlOnlyDoor.bind(this, 46, 1)}>
+                                ONLY Open Door 2
+                            </Button>
+                            <Button className={classes.buttonMargin} variant="contained" color="secondary" onClick={this.controlOnlyDoor.bind(this, 46, 0)}>
+                                ONLY Close Door 2
+                            </Button> 
                         </div>
                         <div className="return_json">
                             <h2 className={classes.testMargin}>name/IP： {door_2.name}/{door_2.ip}</h2>
@@ -139,6 +163,13 @@ class OpenDoor extends Component {
                             </Button>
                             <Button className={classes.buttonMargin} variant="contained" color="secondary" onClick={this.controlDoor.bind(this, 47, 0)}>
                                 Close Door 3
+                            </Button> 
+                            <br></br>
+                            <Button className={classes.buttonMargin} variant="contained" color="primary" onClick={this.controlOnlyDoor.bind(this, 47, 1)}>
+                                ONLY Open Door 3
+                            </Button>
+                            <Button className={classes.buttonMargin} variant="contained" color="secondary" onClick={this.controlOnlyDoor.bind(this, 47, 0)}>
+                                ONLY Close Door 3
                             </Button> 
                         </div>
                         <div className="return_json">

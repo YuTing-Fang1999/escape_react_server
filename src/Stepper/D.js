@@ -13,7 +13,8 @@ import { withStyles } from '@material-ui/core/styles';
 import PanoramaIcon from '@material-ui/icons/Panorama';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
-import AllInboxIcon from '@material-ui/icons/AllInbox';
+import DnsIcon from '@material-ui/icons/Dns';
+
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -87,7 +88,7 @@ function ColorlibStepIcon(props) {
     1: <PanoramaIcon />,
     2: <LibraryBooksIcon />,
     3: <CheckBoxOutlineBlankIcon />,
-    4: <AllInboxIcon/>
+    4: <DnsIcon/>
   };
 
   return (
@@ -109,7 +110,7 @@ ColorlibStepIcon.propTypes = {
 };
 
 function getSteps() {
-  return (['手機掃瞄照片','手機掃描帳本', '白板手寫辨識', '抽屜']);
+  return (['妹妹照片','手機掃描帳本', '白板手寫辨識', '抽屜']);
 }
 
 function getStepContent(step) {

@@ -275,6 +275,7 @@ class AudioControl extends Component {
         this.handleTabChange = this.handleTabChange.bind(this)
         // Sound function
         this.soundStop = this.soundStop.bind(this)
+        this.loopSoundStop = this.loopSoundStop.bind(this)
         this.soundPower = this.soundPower.bind(this)
         this.soundRFID = this.soundRFID.bind(this)
         this.soundDrawer = this.soundDrawer.bind(this)
@@ -294,6 +295,10 @@ class AudioControl extends Component {
     soundStop(){
         axios
             .get('http://192.168.50.210:5000/stopPlayingSound')
+    }
+    loopSoundStop(){
+        axios
+            .get('http://192.168.50.210:5000/stopLoopPlayer')
     }
     soundPower(){
         axios
@@ -328,46 +333,47 @@ class AudioControl extends Component {
             .get('http://192.168.50.210:5000/playThirdRoomAIDefeated')
     }
     componentDidMount() { // per two second update
-        this.timerID = setInterval(
-            () => this.pingIP(),
-            2000
-        );
+        // this.timerID = setInterval(
+        //     () => this.pingIP(),
+        //     2000
+        // );
     }
     componentWillUnmount() {
         clearInterval(this.timerID);
     }
-    pingIP() {
-        axios
-            .get('http://192.168.50.225:8888/checkYoutubeSongList')
-            .then(response => {
-                let data = response.data
-                this.setState({
-                    songList: data
-                })
-            })
-            .catch(error => {
-                this.setState({
-                    songList: ""
-                })
-                console.log(error)
-            })
-        axios
-            .get('http://192.168.50.225:8888/checkSongIndex')
-            .then(response => {
-                let data = response.data
-                this.setState({
-                    playNowIndex: data[0].playNowIndex,
-                    isStopState: data[0].isStopState,
-                    nowProgress: data[0].nowProgress,
-                })
-            })
-            .catch(error => {
-                this.setState({
-                    songList: ""
-                })
-                console.log(error)
-            })
-    }
+    // pingIP() {
+    //     axios
+    //         .get('http://192.168.50.225:8888/checkYoutubeSongList')
+    //         .then(response => {
+    //             let data = response.data
+    //             this.setState({
+    //                 // songList: data
+    //                 songLIst: []
+    //             })
+    //         })
+    //         .catch(error => {
+    //             this.setState({
+    //                 songList: []
+    //             })
+    //             console.log(error)
+    //         })
+    //     axios
+    //         .get('http://192.168.50.225:8888/checkSongIndex')
+    //         .then(response => {
+    //             let data = response.data
+    //             this.setState({
+    //                 playNowIndex: data[0].playNowIndex,
+    //                 isStopState: data[0].isStopState,
+    //                 nowProgress: data[0].nowProgress,
+    //             })
+    //         })
+    //         .catch(error => {
+    //             this.setState({
+    //                 songList: []
+    //             })
+    //             console.log(error)
+    //         })
+    // }
     handleTextFieldChange(e){                           // handle submit add songList
         this.setState({
             textfieldText: e.target.value
@@ -587,7 +593,7 @@ class AudioControl extends Component {
                         <Button className={classes.buttonMargin} variant="contained" color="primary" onClick={this.soundNoise}>
                             Open Sound
                         </Button>
-                        <Button className={classes.buttonMargin} variant="contained" color="secondary" onClick={this.soundStop}>
+                        <Button className={classes.buttonMargin} variant="contained" color="secondary" onClick={this.loopSoundStop}>
                             Close Sound
                         </Button>
                     </div>
