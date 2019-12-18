@@ -162,7 +162,7 @@ export default function HorizontalNonLinearStepper() {
   useInterval(() => {
     update();
     setCount(count + 1);
-  }, 1000);
+  }, 5000);
 
   const update = () => {
     let url="http://192.168.50.225:8888/checkD"
