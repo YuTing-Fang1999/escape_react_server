@@ -96,7 +96,7 @@ class ScreenVideo extends Component {
     componentDidMount() { // per two second update
         this.timerID = setInterval(
             () => this.pingIP(),
-            2000
+            5000
         );
     }
     pingIP() {

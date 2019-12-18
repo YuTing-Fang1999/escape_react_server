@@ -59,16 +59,16 @@ class Dashboard extends Component {
                     .get('http://192.168.50.213:5000/playBlackVideo')
             }
             if(room==2){
-                axios
-                    .get('http://192.168.50.214:5000/playBlackVideo')
-                axios
-                    .get('http://192.168.50.215:5000/playBlackVideo')
-                axios
-                    .get('http://192.168.50.216:5000/playBlackVideo')
+                // axios
+                //     .get('http://192.168.50.214:5000/playBlackVideo')
+                // axios
+                //     .get('http://192.168.50.215:5000/playBlackVideo')
+                // axios
+                //     .get('http://192.168.50.216:5000/playBlackVideo')
             }
             if(room==3){
-                axios
-                    .get('http://192.168.50.212:5000/playBlackVideo')
+                // axios
+                //     .get('http://192.168.50.212:5000/playBlackVideo')
 
                 axios
                     .get('http://192.168.50.217:5000/playBlackVideo')
@@ -124,7 +124,7 @@ class Dashboard extends Component {
                         重設機關資料庫
                     </Button>
                     <Button className={classes.buttonMargin} variant="contained" onClick={this.handleResetDataButton.bind(this, 1)}>
-                        重設手機資料庫
+                        重設手機 Like 資料庫
                     </Button>
                 </div>
                 <br/>

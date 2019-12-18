@@ -44,7 +44,7 @@ class OpenDrawer extends Component {
     componentDidMount() { // per two second update
         this.timerID = setInterval(
             () => this.pingIP(),
-            2000
+            5000
         );
     }
     componentWillUnmount() {
@@ -101,6 +101,7 @@ class OpenDrawer extends Component {
             <React.Fragment>
                 <h2>抽屜控制</h2>
                     <Paper className={fixedHeightPaper}>
+                        <h2 className={classes.testMargin}>D (手寫辦視)</h2>
                         <div className="dock_1">
                             <Button className={classes.buttonMargin} variant="contained" color="primary" onClick={this.controlDock.bind(this, 40, 1)}>
                                 Open Drawer 1
@@ -117,6 +118,7 @@ class OpenDrawer extends Component {
                     </Paper>
                     <br/>    
                     <Paper className={fixedHeightPaper}>
+                        <h2 className={classes.testMargin}>B (棺材)</h2>
                         <div className="dock_2">
                             <Button className={classes.buttonMargin} variant="contained" color="primary" onClick={this.controlDock.bind(this, 41, 1)}>
                                 Open Drawer 2
@@ -133,6 +135,7 @@ class OpenDrawer extends Component {
                     </Paper>
                     <br/>
                     <Paper className={fixedHeightPaper}>
+                        <h2 className={classes.testMargin}>C (計算機)</h2>
                         <div className="dock_3">
                             <Button className={classes.buttonMargin} variant="contained" color="primary" onClick={this.controlDock.bind(this, 42, 1)}>
                                 Open Drawer 3

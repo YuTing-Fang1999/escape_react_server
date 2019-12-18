@@ -124,7 +124,7 @@ class TimeCounter extends Component {
     componentDidMount() { // per two second update
         this.timerID = setInterval(
             () => this.pingIP(),
-            1000
+            5000
         );
     }
     componentWillUnmount() {

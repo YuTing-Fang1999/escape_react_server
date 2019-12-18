@@ -117,13 +117,13 @@ def checkUsb():
 def firstUsb():
 
 	# close power
-	requests.get("http://192.168.50.225:8888/getPower/0")
+	requests.get("http://192.168.50.225:8888/getOnlyLight/0")
 	# close sound
 	requests.get("http://192.168.50.210:5000/stopPlayingSound")
 	# play noise sound
 	requests.get("http://192.168.50.210:5000/playStartAnnoyingSound")
-	# close alert light
-	requests.get("http://192.168.50.91/set_light?params=0")
+	# close alert light 
+	# code at 218 Rpi
 	# light line (floar)
 	requests.get("http://192.168.50.70/set_breathing_light?params=1")
 	# light line (mask)
@@ -630,7 +630,7 @@ def checkNineBlock(iscorrect):
 		requests.get('http://192.168.50.19/set_breathing_light?params=0')
 		requests.get('http://192.168.50.19/set_color?params=000000')
 		# black video
-		requests.get('http://192.168.50.212:5000/playBlackVideo')
+		# requests.get('http://192.168.50.212:5000/playBlackVideo')
 		requests.get('http://192.168.50.217:5000/playBlackVideo')
 	
 
@@ -645,9 +645,16 @@ def checkNineBlock(iscorrect):
 		requests.get("http://192.168.50.225:8888/openDoor/47/1")
 
 		time.sleep(2)
+		
+		# when server is laggy
+		# # play open power sound
+		# requests.get("http://192.168.50.210:5000/playFirstRoomPowerOn")
+		# # open light
+		# requests.get("http://192.168.50.225:8888/getOnlyLight/1")
 
-		# open light
-		requests.get("http://192.168.50.225:8888/getPower/1")
+		# when server is not laggy
+		requests.get("http://192.168.50.225:8888/getPower/1") 
+
 		# close AI noise
 		requests.get("http://192.168.50.210:5000/stopLoopPlayer") 
 		
@@ -871,6 +878,8 @@ def resetRoomState(room):
 		requests.get('http://192.168.50.225:8888/getPower/0')
 		# Close RFID
 		requests.get('http://192.168.50.225:8888/resetRFID/0')
+		# ResetStoreVideo
+		requests.get('http://192.168.50.225:8888/ResetStoreVideo')
 
 	return "test"
 
@@ -1057,10 +1066,11 @@ def getFirstRoomPassword():
 
 	# turn Camera to second room
 	time.sleep(2)
-	requests.get("http://192.168.50.225:8888/setFirstRoomCamera/3")
-
 	# turn off yolo
 	requests.get('http://192.168.50.225:8888/killFirstRoomCamera')
+	# turn camera to room 2
+	requests.get('http://192.168.50.203:8090/move/140/80')
+	requests.get('http://192.168.50.200:8090/move/40/80')
 
 	return "password get successfully"
 
@@ -1230,16 +1240,6 @@ def checkRoom3():
 
 def checkVideo():
 	data={}
-	dirpath=os.getcwd()
-	dirpath=os.path.join(dirpath,"pythonHTTP","storevideo")
-	data["outputA"]=os.path.isfile(os.path.join(dirpath,"outputA.avi"))
-	data["outputB"]=os.path.isfile(os.path.join(dirpath,"outputB.avi"))
-	data["outputC"]=os.path.isfile(os.path.join(dirpath,"outputC.avi"))
-	data["outputD"]=os.path.isfile(os.path.join(dirpath,"outputD.avi"))
-	data["frame_person_A"]=os.path.isfile(os.path.join(dirpath,"frame_person_A.avi"))
-	data["frame_person_B"]=os.path.isfile(os.path.join(dirpath,"frame_person_B.avi"))
-	data["frame_person_C"]=os.path.isfile(os.path.join(dirpath,"frame_person_C.avi"))
-	data["frame_person_D"]=os.path.isfile(os.path.join(dirpath,"frame_person_D.avi"))
 
 	time_json = db.savingTime.find()
 	time_json = json.loads(json_util.dumps(time_json))
@@ -1298,19 +1298,19 @@ def StoreVideo(name):
 	os.chdir("/home/micro/mushding-app/pythonHTTP/storevideo")
 	key=""
 	if name == "frame_person_A":
-		# key="A_done"
+		key="A_done"
 		db.videoState.update({"name": "videoState"}, {"$set": {"start": True}}, True)
-		os.system("./videoA.sh")
+		# os.system("./videoA.sh")
 	if name == "frame_person_B":
-		# key="B_done"
-		os.system("./videoB.sh")
+		key="B_done"
+		# os.system("./videoB.sh")
 	if name == "frame_person_C":
-		# key="C_done"
-		os.system("./videoC.sh")
+		key="C_done"
+		# os.system("./videoC.sh")
 	if name == "frame_person_D":
-		# key="D_done"/
-		os.system("./videoC.sh")
-	# db.videoState.update({"name": "videoState"}, {"$set": {key: True}}, True)
+		key="D_done"
+		# os.system("./videoC.sh")
+	db.videoState.update({"name": "videoState"}, {"$set": {key: True}}, True)
 	return name
 
 @app.route('/ResetStoreVideo', methods=['GET'])

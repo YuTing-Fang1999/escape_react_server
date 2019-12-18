@@ -175,7 +175,7 @@ export default function HorizontalNonLinearStepper() {
           // console.log(data);
           const newCompleted = completed;
           newCompleted[0] = data["wireBox"];
-          newCompleted[1] = !data["door2_lock"];
+          newCompleted[1] = data["door2_lock"];
           setCompleted(newCompleted);
         }
       })

@@ -152,7 +152,7 @@ class DashboardTemplates extends Component {
         })
       this.timerID = setInterval(
         () => this.pingIP(),
-        3000
+        5000
       );
   }
   pingIP(){

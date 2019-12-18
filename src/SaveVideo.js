@@ -134,8 +134,6 @@ class SaveVideo extends React.Component {
             open: false,
             index: 0,
         }
-        // this.saveVedio=this.saveVedio.bind(this);
-        this.exists=this.exists.bind(this);
         this.chechVideo=this.chechVideo.bind(this);
         this.getSteps=this.getSteps.bind(this);
         this.SaveVideo=this.saveVedio.bind(this);
@@ -147,16 +145,11 @@ class SaveVideo extends React.Component {
         this.chechVideo();
         this.timerID = setInterval(
             () => this.chechVideo(),
-            2000
+            5000
         );
     }
     componentWillUnmount() {
         clearInterval(this.timerID);
-    }
-
-    exists(b){
-        if(b) return "存在";
-        else return "無";
     }
     computeSec(){
         var now=new Date();
@@ -172,51 +165,33 @@ class SaveVideo extends React.Component {
             .get('http://192.168.50.225:8888/checkVideo')
             .then(data => {
                 data=data["data"];
-                // console.log("end:"+this.state.end+",start:"+this.state.start);
+                console.log("end:"+this.state.end+",start:"+this.state.start);
                 const newCompleted = this.state.completed;
                 newCompleted[0] = data["state"]["A_done"];
                 newCompleted[1] = data["state"]["B_done"];
                 newCompleted[2] = data["state"]["C_done"];
                 newCompleted[3] = data["state"]["D_done"];
                 this.setState({
-                    outputA: data["outputA"],
-                    outputB: data["outputB"],
-                    outputC: data["outputC"],
-                    outputD: data["outputD"],
-                    frame_person_A: data["frame_person_A"],
-                    frame_person_B: data["frame_person_B"],
-                    frame_person_C: data["frame_person_C"],
-                    frame_person_D: data["frame_person_D"],
                     start: data["state"]["start"],
                     end: data["state"]["end"],
                     min: data["time"]["min"],
                     sec: data["time"]["sec"],
                     completed: newCompleted,
                 },function(){
-                  if(!this.state.start){
+                  if(!this.state.start && !this.end){
                     this.setState({msg: "還未儲存",time: ""})
                   }else if(this.state.start && !this.state.end){
                     this.setState({msg: "正在儲存"});
                     this.computeSec();
-                  }else{
+                  }else if(this.state.start && this.state.end){
                     this.setState({msg: "儲存完畢",time: ""});
                     clearInterval(this.timerID);
                   }
 
-                  if(this.state.start &&　this.state.time>350){
-                    if(!this.state.completed[0]){
-                      this.saveVedio(0);
-                      this.setState({time: 0});
-                    }else if(!this.state.completed[1]){
-                      this.saveVedio(1);
-                      this.setState({time: 0});
-                    }else if(!this.state.completed[2]){
-                      this.saveVedio(2);
-                      this.setState({time: 0});
-                    }else if(!this.state.completed[3]){
-                      this.saveVedio(3);
-                      this.setState({time: 0});
-                    }
+                  if(this.state.start &&　this.state.time>150){
+                    this.setState({
+                      msg: "影片掛了",
+                    })
                   }
                 })
             })
@@ -284,7 +259,7 @@ class SaveVideo extends React.Component {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{"確定要強制儲存影片嗎?"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{"因為影片掛掉我也無法用pid砍，所以此按鈕只是用來測試資料庫的"}</DialogTitle>
         <DialogActions>
           <Button onClick={()=>{this.setState({open: false})}} color="primary">
             取消

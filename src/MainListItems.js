@@ -75,12 +75,12 @@ export default function MainListItems(props) {
         </ListItemIcon>
         <ListItemText primary="螢幕影片控制" />
       </ListItem>
-      <ListItem button to="/save_vedio" component={Link}>
+      {/* <ListItem button to="/save_vedio" component={Link}>
         <ListItemIcon>
           <YouTubeIcon />
         </ListItemIcon>
         <ListItemText primary="儲存影片" />
-      </ListItem>
+      </ListItem> */}
     </List>
     </div>
   );
