@@ -648,12 +648,12 @@ def checkNineBlock(iscorrect):
 		
 		# when server is laggy
 		# # play open power sound
-		# requests.get("http://192.168.50.210:5000/playFirstRoomPowerOn")
-		# # open light
-		# requests.get("http://192.168.50.225:8888/getOnlyLight/1")
+		requests.get("http://192.168.50.210:5000/playFirstRoomPowerOn")
+		# open light
+		requests.get("http://192.168.50.225:8888/getOnlyLight/1")
 
 		# when server is not laggy
-		requests.get("http://192.168.50.225:8888/getPower/1") 
+		# requests.get("http://192.168.50.225:8888/getPower/1") 
 
 		# close AI noise
 		requests.get("http://192.168.50.210:5000/stopLoopPlayer") 
@@ -849,6 +849,9 @@ def resetPhoneState():
 @app.route('/resetRoomState/<int:room>', methods=['GET'])
 def resetRoomState(room):
 	if room == 3:
+		# light off (mask)
+		requests.get('http://192.168.50.19/set_breathing_light?params=0')
+		requests.get('http://192.168.50.19/set_color?params=000000')
 		# light off (floar)
 		requests.get('http://192.168.50.70/set_breathing_light?params=0')
 		requests.get('http://192.168.50.70/set_color?params=000000')
@@ -858,9 +861,6 @@ def resetRoomState(room):
 		requests.get('http://192.168.50.90/set_light?params=0')
 		# reset usb first
 		requests.get('http://192.168.50.218:5000/resetFirstUsb')
-		# light off (mask)
-		requests.get('http://192.168.50.19/set_breathing_light?params=0')
-		requests.get('http://192.168.50.19/set_color?params=000000')
 	elif room == 2:
 		# Close All Drawer
 		for ip in range(40, 43):

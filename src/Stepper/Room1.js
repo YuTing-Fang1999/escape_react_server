@@ -148,7 +148,7 @@ export default function HorizontalNonLinearStepper() {
 
   useInterval(() => {
     update();
-    setCount(count + 1);
+    // setCount(count + 1);
   }, 5000);
 
   const update = () => {
@@ -165,24 +165,10 @@ export default function HorizontalNonLinearStepper() {
           newCompleted[1] = data["RFID"];
           newCompleted[2] = data["password"];
           setCompleted(newCompleted);
-          // this.setState(
-          //   {
-          //     snackbarOpen: true,
-          //     snackbarContent: "update",
-          //     variant: "success"
-          //   }
-          // )
         }
       })
       .catch((error)=>{
           console.log(error);
-          // this.setState(
-          //   {
-          //     snackbarOpen: true,
-          //     snackbarContent: "fail: cannot conect flask",
-          //     variant: "error"
-          //   }
-          // )
       });
     
   }
