@@ -3,6 +3,7 @@ mnist
 node_modules
 scripts/flow/*/.flowconfig
 *~
+*.avi
 *.pyc
 .grunt
 _SpecRunner.html
