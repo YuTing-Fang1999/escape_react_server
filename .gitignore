@@ -1,6 +1,6 @@
 .DS_STORE
+mnist
 node_modules
-*.avi
 scripts/flow/*/.flowconfig
 *~
 *.pyc
