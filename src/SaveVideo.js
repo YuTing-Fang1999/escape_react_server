@@ -165,7 +165,7 @@ class SaveVideo extends React.Component {
             .get('http://192.168.50.225:8888/checkVideo')
             .then(data => {
                 data=data["data"];
-                console.log("end:"+this.state.end+",start:"+this.state.start);
+                // console.log("end:"+this.state.end+",start:"+this.state.start);
                 const newCompleted = this.state.completed;
                 newCompleted[0] = data["state"]["A_done"];
                 newCompleted[1] = data["state"]["B_done"];

@@ -8,6 +8,11 @@ import StepLabel from '@material-ui/core/StepLabel';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Button from '@material-ui/core/Button'
+
 import PhonelinkLockIcon from '@material-ui/icons/PhonelinkLock';
 import EmojiObjectsRoundedIcon from '@material-ui/icons/EmojiObjectsRounded';
 import CreditCardRoundedIcon from '@material-ui/icons/CreditCardRounded';
@@ -100,24 +105,30 @@ function getSteps() {
   return (['燈', 'RFID','手機解鎖']);
 }
 
-function getStepContent(step) {
-  switch (step) {
-    case 0:
-      console.log('Step 1') ;
-      break;
-    case 1:
-      console.log('Step 2') ;
-      break;
-    case 2:
-      console.log('Step 3') ;
-      break;
-    case 3:
-      console.log('Step 4') ;
-      break;
-    default:
-        console.log('unknow');
-  }
-}
+// function getStepContent(step) {
+//   switch (step) {
+//     case 0:
+//       console.log('control Light') ;
+//       setOpen(true);
+//       break;
+//     case 1:
+//       console.log('close RFID') ;
+//       axios
+//             .get('http://192.168.50.225:8888/resetRFID/0')
+//             .then(res => {
+//                 // console.log(res)
+//             })
+//       break;
+//     case 2:
+//       console.log('Step 3') ;
+//       break;
+//     case 3:
+//       console.log('Step 4') ;
+//       break;
+//     default:
+//         console.log('unknow');
+//   }
+// }
 
 function useInterval(callback, delay) {
   const savedCallback = useRef();
@@ -144,6 +155,8 @@ export default function HorizontalNonLinearStepper() {
   const [activeStep, setActiveStep] = React.useState(0);
   const [completed, setCompleted] = React.useState({});
   const [count, setCount] = useState(0);
+  const [open, setOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const steps = getSteps();
 
   useInterval(() => {
@@ -178,18 +191,69 @@ export default function HorizontalNonLinearStepper() {
     getStepContent(step);
   };
 
+  const openLight = () =>{
+    axios
+            .get('http://192.168.50.225:8888/getOnlyLight/1')
+  }
+
+  const closeLight = () =>{
+    axios
+            .get('http://192.168.50.225:8888/getOnlyLight/0')
+  }
+
+  const getStepContent = step => {
+    switch (step) {
+      case 0:
+        console.log('control Light') ;
+        setOpen(true);
+        break;
+      case 1:
+        console.log('close RFID') ;
+        axios
+              .get('http://192.168.50.225:8888/resetRFID/0')
+              .then(res => {
+                  // console.log(res)
+              })
+        break;
+      case 2:
+        console.log('Step 3') ;
+        break;
+      case 3:
+        console.log('Step 4') ;
+        break;
+      default:
+          console.log('unknow');
+    }
+  }
+
   return (
-    <div className={classes.root}>
+  <div className={classes.root}>
       {/* <h1>{count}</h1> */}
   <Stepper nonLinear activeStep={null} alternativeLabel connector={<ColorlibConnector />}>
-        {steps.map((label, index) => (
-          <Step key={label}>
-            <StepButton onClick={handleStep(index)} completed={completed[index]}>
-              <StepLabel StepIconComponent={ColorlibStepIcon}>{label}</StepLabel>
-            </StepButton>
-          </Step>
-        ))}
-      </Stepper>
-    </div>
+    {steps.map((label, index) => (
+      <Step key={label}>
+        <StepButton onClick={handleStep(index)} completed={completed[index]}>
+          <StepLabel StepIconComponent={ColorlibStepIcon}>{label}</StepLabel>
+        </StepButton>
+      </Step>
+    ))}
+  </Stepper>
+  <Dialog
+        open={open}
+        onClose={()=>{setOpen(false)}}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Control Light"}</DialogTitle>
+        <DialogActions>
+          <Button onClick={()=>{openLight()}} color="primary">
+            Open
+          </Button>
+          <Button onClick={()=>{closeLight()}} color="primary" autoFocus>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+  </div>
   );
 }

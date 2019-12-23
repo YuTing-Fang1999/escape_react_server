@@ -1,6 +1,6 @@
 .DS_STORE
 node_modules
-pythonHTTP
+*.avi
 scripts/flow/*/.flowconfig
 *~
 *.pyc

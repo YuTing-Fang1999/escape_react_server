@@ -321,23 +321,29 @@ def checkPower():
 @app.route('/getOnlyLight/<int:index>', methods=['GET'])
 def getOnlyLight(index):
 	requests.get('http://192.168.50.49/set_lock?params=' + str(index))
+	db.firstRoomPower.find_one_and_update({
+		"isOpen": {"$exists": True}}, 
+		{"$set": {"isOpen": index},
+	})
 	return "ok"
 
 # Get Electric Power (49) for progress
 @app.route('/getPower/<int:index>', methods=['GET'])
 def getPower(index):
+	power = requests.get('http://192.168.50.49')
+	
 	if index == 1:
 		meg_state = " 打開了！"
 	if index == 0:
 		meg_state = " 關起來了！"
 
 	# sound effect
-	if index == 1:
+	if index == 1 and power.json()['variables']['lock'] == 0:
 		requests.get('http://192.168.50.210:5000/playFirstRoomPowerOn')
 		time.sleep(1.1)
 	
 	# Open Camera
-	if index == 1:
+	if index == 1 and power.json()['variables']['lock'] == 0:
 		requests.get('http://192.168.50.225:8888/setFirstRoomCamera/1')
 		requests.get('http://192.168.50.225:8888/setFirstRoomCamera/2')
 	elif index == 0:
@@ -1266,19 +1272,35 @@ def checkStoreVideo(name, pid):
 	if name == "frame_person_A.avi":
 		os.system('kill -9 ' + str(pid))
 		db.videoState.update({"name": "videoState"}, {"$set": {"A_done": True}}, True)
+		db.notifications.insert({
+	    '_id': nextNotifications("productid"),
+	    'avatarIcon': "DialpadIcon",
+	    'message': "A is done",})
 		m=os.system("./videoB.sh &")
 	if name == "frame_person_B.avi":
 		os.system('kill -9 ' + str(pid))
 		db.videoState.update({"name": "videoState"}, {"$set": {"B_done": True}}, True)
+		db.notifications.insert({
+	    '_id': nextNotifications("productid"),
+	    'avatarIcon': "DialpadIcon",
+	    'message': "B is done",})
 		m=os.system("./videoC.sh &")
 	if name == "frame_person_C.avi":
 		os.system('kill -9 ' + str(pid))
 		db.videoState.update({"name": "videoState"}, {"$set": {"C_done": True}}, True)
+		db.notifications.insert({
+	    '_id': nextNotifications("productid"),
+	    'avatarIcon': "DialpadIcon",
+	    'message': "C is done",})
 		m=os.system("./videoD.sh &")
 	if name == "frame_person_D.avi":
 		os.system('kill -9 ' + str(pid))
 		# start merge video
 		os.system('python3 ./merge_video.py &')
+		db.notifications.insert({
+	    '_id': nextNotifications("productid"),
+	    'avatarIcon': "DialpadIcon",
+	    'message': "D is done",})
 		db.videoState.update({"name": "videoState"}, {"$set": {"D_done": True}}, True)
 	if m==0:
 		return "開始儲存"
